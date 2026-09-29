@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Hookline Song Studio</title>
+  <meta name="description" content="Write, generate, remix and polish AI songs with your SunoAPI key." />
+  <meta name="theme-color" content="#7c3aed" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="assets/js/theme-boot.js"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script type="module" src="assets/js/app.js"></script>
+</head>
+<body>
+  <!-- SVG icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-system" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M6 6v12M18 6.5v11a1 1 0 0 1-1.5.8L9 13a1 1 0 0 1 0-1.8l7.5-5.5a1 1 0 0 1 1.5.8z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M18 6v12M6 6.5v11a1 1 0 0 0 1.5.8L15 13a1 1 0 0 0 0-1.8L7.5 5.7A1 1 0 0 0 6 6.5z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" fill="currentColor"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-lyrics" viewBox="0 0 24 24"><path d="M4 6h16M4 11h10M4 16h13M4 21h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z" fill="currentColor"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <!-- ============ KEY GATE ============ -->
+  <section id="gate" class="gate" hidden>
+    <div class="gate-card">
+      <div class="brand brand-lg"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Hookline</span></div>
+      <h1 class="gate-title">Turn an idea into a song<br /><span class="grad">in about a minute.</span></h1>
+      <p class="muted">Describe a vibe, write your own lyrics, or remix a track you already have. Hookline runs on your own <a href="https://sunoapi.org" target="_blank" rel="noopener">SunoAPI</a> key.</p>
+
+      <ol class="gate-steps">
+        <li><b>1</b><span>Grab a key from <a href="https://sunoapi.org/api-key" target="_blank" rel="noopener">sunoapi.org/api-key</a></span></li>
+        <li><b>2</b><span>Paste it below. We check it by fetching your credit balance</span></li>
+        <li><b>3</b><span>Start creating</span></li>
+      </ol>
+
+      <form id="gate-form" class="gate-form" autocomplete="off">
+        <label class="field">
+          <span class="label">SunoAPI key</span>
+          <div class="input-group">
+            <input id="gate-key" type="password" placeholder="Paste your API key" required spellcheck="false" autocomplete="off" />
+            <button type="button" class="btn btn-ghost btn-sm" id="gate-reveal" aria-label="Show key">Show</button>
+          </div>
+        </label>
+        <label class="field field-inline switch">
+          <input type="checkbox" id="gate-remember" checked /><span class="track-ui"></span>
+          <span class="label">Remember on this device</span>
+        </label>
+        <p id="gate-error" class="error" role="alert" hidden></p>
+        <button class="btn btn-primary btn-lg btn-block" id="gate-submit" type="submit">Unlock the studio</button>
+        <p class="fine">Your key is stored only in this browser. It's sent only to SunoAPI, through this site's pass-through proxy.</p>
+      </form>
+
+      <div class="gate-foot">
+        <div class="theme-switch" role="radiogroup" aria-label="Theme"></div>
+      </div>
+    </div>
+    <div class="gate-art" aria-hidden="true"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="eq big"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  </section>
+
+  <!-- ============ APP ============ -->
+  <div id="app" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Hookline</span></div>
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button role="tab" data-view="create" aria-selected="true">Create</button>
+        <button role="tab" data-view="lyrics">Lyrics Lab</button>
+        <button role="tab" data-view="remix">Remix</button>
+        <button role="tab" data-view="sounds">Sound FX</button>
+        <button role="tab" data-view="library">Library <span class="count" id="lib-count"></span></button>
+      </nav>
+      <div class="topbar-right">
+        <button class="pill" id="jobs-pill" hidden title="Songs in progress"><span class="spinner"></span><span id="jobs-pill-n">0</span> cooking</button>
+        <button class="pill credits" id="credits" title="Remaining credits. Click to refresh."><svg><use href="#i-sparkle"/></svg><span id="credits-n">–</span></button>
+        <div class="theme-switch" role="radiogroup" aria-label="Theme"></div>
+        <button class="icon-btn" id="key-btn" title="API key"><svg><use href="#i-key"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ---------- CREATE ---------- -->
+      <section class="view" id="view-create" data-view="create">
+        <div class="create-grid">
+          <form class="card create-form" id="create-form" autocomplete="off">
+            <div class="card-head">
+              <div>
+                <h2>Create a song</h2>
+                <p class="muted" id="mode-blurb">Describe it in plain words and we handle the rest.</p>
+              </div>
+              <div class="segmented mode-toggle" role="radiogroup" aria-label="Mode">
+                <button type="button" role="radio" data-mode="simple" aria-checked="true">Simple</button>
+                <button type="button" role="radio" data-mode="custom" aria-checked="false">Custom</button>
+              </div>
+            </div>
+
+            <div class="step"><span class="step-n">1</span><span class="label">Pick a model</span>
+              <label class="mini-switch right"><input type="checkbox" id="show-legacy" /> Show legacy</label>
+            </div>
+            <div class="models" id="models" role="radiogroup" aria-label="Model"></div>
+
+            <!-- Simple mode -->
+            <div data-simple>
+              <div class="step"><span class="step-n">2</span><span class="label">What's the song about?</span>
+                <button type="button" class="btn btn-ghost btn-sm right" id="surprise"><svg><use href="#i-dice"/></svg> Surprise me</button>
+              </div>
+              <label class="field">
+                <textarea id="s-prompt" rows="4" maxlength="3000" placeholder="e.g. A feel-good summer anthem about road-tripping with my best friends, windows down, singing off-key"></textarea>
+                <span class="counter" data-for="s-prompt">0 / 3000</span>
+              </label>
+              <div class="step"><span class="step-n">3</span><span class="label">Add some flavor <span class="muted">(optional)</span></span></div>
+              <label class="field">
+                <input id="s-style" type="text" maxlength="1000" placeholder="Style tags, e.g. indie pop, handclaps, female vocals" />
+              </label>
+              <div class="chips" data-target="s-style"></div>
+              <details class="more">
+                <summary>Inspiration attachments <span class="muted">(reference audio, images, video, your own lyrics)</span></summary>
+                <p class="hint">Only used in Simple mode. Files are uploaded to SunoAPI's temporary storage (deleted after 3 days).</p>
+                <div class="attach-grid">
+                  <div class="attach" data-attach="audio" data-accept="audio/*" data-max="1"><span class="label">Reference audio</span><span class="hint">6 s to 30 min</span></div>
+                  <div class="attach" data-attach="image" data-accept="image/jpeg,image/png,image/webp,image/bmp" data-max="5"><span class="label">Images</span><span class="hint">Up to 5, 10 MB each</span></div>
+                  <div class="attach" data-attach="video" data-accept="video/mp4,video/quicktime,video/webm" data-max="1"><span class="label">Video</span><span class="hint">Up to 241 s</span></div>
+                </div>
+                <label class="field"><span class="label">Your lyrics (optional)</span>
+                  <textarea id="s-lyrics" rows="3" maxlength="5000" placeholder="Paste lyrics you'd like the song to use"></textarea></label>
+              </details>
+            </div>
+
+            <!-- Custom mode -->
+            <div data-custom hidden>
+              <div class="row-2">
+                <label class="field"><span class="label">Title</span>
+                  <input id="c-title" type="text" maxlength="80" placeholder="Give it a name" /></label>
+                <div class="field"><span class="label">Vocals</span>
+                  <div class="segmented" id="c-gender" role="radiogroup">
+                    <button type="button" role="radio" data-v="" aria-checked="true">Any</button>
+                    <button type="button" role="radio" data-v="f" aria-checked="false">Female</button>
+                    <button type="button" role="radio" data-v="m" aria-checked="false">Male</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step"><span class="step-n">2</span><span class="label">Style of music</span>
+                <button type="button" class="btn btn-ghost btn-sm right" id="boost" title="Let AI expand your style into a richer description"><svg><use href="#i-sparkle"/></svg> Boost style</button>
+              </div>
+              <label class="field">
+                <textarea id="c-style" rows="2" maxlength="1000" placeholder="e.g. 90s R&B, silky female vocals, warm Rhodes, slow jam"></textarea>
+                <span class="counter" data-for="c-style">0 / 1000</span>
+              </label>
+              <div class="chips" data-target="c-style"></div>
+
+              <label class="field field-inline switch"><input type="checkbox" id="c-instrumental" /><span class="track-ui"></span><span class="label">Instrumental (no vocals)</span></label>
+
+              <div data-lyrics>
+                <div class="step"><span class="step-n">3</span><span class="label">Lyrics</span>
+                  <button type="button" class="btn btn-ghost btn-sm right" id="write-lyrics"><svg><use href="#i-lyrics"/></svg> Write them for me</button>
+                </div>
+                <div class="tagbar" id="tagbar"></div>
+                <label class="field">
+                  <textarea id="c-lyrics" rows="10" maxlength="5000" placeholder="[Verse]&#10;Streetlights hum a quiet tune…&#10;&#10;[Chorus]&#10;…"></textarea>
+                  <span class="counter" data-for="c-lyrics">0 / 5000</span>
+                </label>
+              </div>
+
+              <details class="more">
+                <summary>Advanced controls</summary>
+                <label class="field"><span class="label">Exclude styles</span>
+                  <input id="c-negative" type="text" maxlength="1000" placeholder="e.g. heavy metal, autotune, screaming" /></label>
+                <div class="field range-field" id="dur-field">
+                  <div class="range-head"><label class="mini-switch"><input type="checkbox" id="c-dur-on" /> <span class="label">Target length</span></label><output id="c-dur-out">2:00</output></div>
+                  <input type="range" id="c-dur" min="10" max="360" step="5" value="120" disabled />
+                  <span class="hint">10 s to 6 min. V6-series models only.</span>
+                </div>
+                <div id="c-advanced"></div>
+                <div class="row-2">
+                  <label class="field"><span class="label">Persona / Voice</span>
+                    <select id="c-persona"><option value="">None</option></select></label>
+                  <label class="field"><span class="label">Persona type</span>
+                    <select id="c-persona-model"><option value="style_persona">Style persona</option><option value="voice_persona">Voice persona (Suno Voice ID)</option></select></label>
+                </div>
+                <label class="field"><span class="label">…or paste a Persona / Voice ID</span>
+                  <input id="c-persona-id" type="text" placeholder="Persona ID" spellcheck="false" /></label>
+              </details>
+            </div>
+
+            <label class="field field-inline switch" data-simple-only><input type="checkbox" id="s-instrumental" /><span class="track-ui"></span><span class="label">Instrumental (no vocals)</span></label>
+
+            <div class="create-actions">
+              <p class="hint">Each run creates <b>two</b> takes. <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to generate.</p>
+              <button class="btn btn-primary btn-lg" id="generate" type="submit"><svg><use href="#i-sparkle"/></svg> Generate song</button>
+            </div>
+          </form>
+
+          <aside class="create-side">
+            <div class="card">
+              <div class="card-head"><h3>Studio monitor</h3></div>
+              <div class="jobs-list" data-jobs></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Fresh off the press</h3><button class="btn btn-ghost btn-sm" data-goto="library">See all</button></div>
+              <div class="track-list compact" id="recent"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ---------- LYRICS LAB ---------- -->
+      <section class="view" id="view-lyrics" data-view="lyrics" hidden>
+        <div class="card narrow">
+          <div class="card-head"><div><h2>Lyrics Lab</h2><p class="muted">Describe a theme and get full song lyrics, with no audio credits spent on drafts.</p></div></div>
+          <form id="lyrics-form" class="form">
+            <label class="field">
+              <textarea id="l-prompt" rows="3" maxlength="200" placeholder="e.g. A bittersweet song about leaving your hometown, hopeful chorus, verse-chorus-bridge"></textarea>
+              <span class="counter" data-for="l-prompt">0 / 200</span>
+            </label>
+            <div class="row-actions">
+              <button type="button" class="btn btn-ghost" id="l-surprise"><svg><use href="#i-dice"/></svg> Inspire me</button>
+              <button class="btn btn-primary" type="submit"><svg><use href="#i-lyrics"/></svg> Write lyrics</button>
+            </div>
+          </form>
+          <div class="jobs-list" data-jobs="lyrics"></div>
+        </div>
+        <div class="lyric-grid" id="lyric-drafts"></div>
+      </section>
+
+      <!-- ---------- REMIX ---------- -->
+      <section class="view" id="view-remix" data-view="remix" hidden>
+        <div class="card narrow">
+          <div class="card-head"><div><h2>Remix</h2><p class="muted">Bring your own audio (a voice memo, a beat, a demo) and transform it.</p></div></div>
+          <div class="remix-modes" id="remix-modes" role="radiogroup" aria-label="Remix type"></div>
+          <div id="remix-body"></div>
+        </div>
+      </section>
+
+      <!-- ---------- SOUND FX ---------- -->
+      <section class="view" id="view-sounds" data-view="sounds" hidden>
+        <div class="card narrow">
+          <div class="card-head"><div><h2>Sound FX &amp; loops</h2><p class="muted">Ambiences, drum loops, stingers. Set a tempo and key and loop it.</p></div></div>
+          <div id="sounds-body"></div>
+        </div>
+      </section>
+
+      <!-- ---------- LIBRARY ---------- -->
+      <section class="view" id="view-library" data-view="library" hidden>
+        <div class="lib-head">
+          <div><h2>Your library</h2><p class="muted">Saved in this browser. Audio links from SunoAPI expire after about 15 days, so download the keepers.</p></div>
+          <div class="lib-tools">
+            <input type="search" id="lib-search" placeholder="Search titles, tags, lyrics…" />
+            <div class="segmented" id="lib-filter" role="radiogroup">
+              <button type="button" role="radio" data-v="all" aria-checked="true">All</button>
+              <button type="button" role="radio" data-v="fav" aria-checked="false">★ Favorites</button>
+              <button type="button" role="radio" data-v="sounds" aria-checked="false">Sounds</button>
+            </div>
+          </div>
+        </div>
+        <div class="jobs-list" data-jobs></div>
+        <div class="track-grid" id="library"></div>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Sections">
+      <button data-view="create"><svg><use href="#i-sparkle"/></svg>Create</button>
+      <button data-view="lyrics"><svg><use href="#i-lyrics"/></svg>Lyrics</button>
+      <button data-view="remix"><svg><use href="#i-upload"/></svg>Remix</button>
+      <button data-view="sounds"><svg><use href="#i-mic"/></svg>FX</button>
+      <button data-view="library"><svg><use href="#i-star"/></svg>Library</button>
+    </nav>
+
+    <!-- ---------- PLAYER ---------- -->
+    <div class="player" id="player" hidden>
+      <div class="p-progress"><input type="range" id="p-seek" min="0" max="1000" value="0" aria-label="Seek" /></div>
+      <div class="p-inner">
+        <button class="p-meta" id="p-meta" title="Open track">
+          <span class="p-art" id="p-art"></span>
+          <span class="p-text"><b id="p-title">–</b><small id="p-tags"></small></span>
+        </button>
+        <div class="p-controls">
+          <button class="icon-btn" id="p-prev" aria-label="Previous"><svg><use href="#i-prev"/></svg></button>
+          <button class="icon-btn p-play" id="p-play" aria-label="Play"><svg><use href="#i-play"/></svg></button>
+          <button class="icon-btn" id="p-next" aria-label="Next"><svg><use href="#i-next"/></svg></button>
+        </div>
+        <div class="p-right">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="p-time"><span id="p-cur">0:00</span> / <span id="p-dur">0:00</span></span>
+          <button class="btn btn-ghost btn-sm" id="p-karaoke" title="Sing along with synced lyrics"><svg><use href="#i-mic"/></svg><span class="hide-sm"> Sing along</span></button>
+          <input type="range" id="p-vol" min="0" max="1" step="0.01" value="1" aria-label="Volume" class="hide-sm" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- KARAOKE ---------- -->
+  <div class="karaoke" id="karaoke" hidden>
+    <div class="k-bg" id="k-bg"></div>
+    <button class="icon-btn k-close" id="k-close" aria-label="Close">×</button>
+    <div class="k-head"><b id="k-title"></b><small id="k-tags"></small></div>
+    <div class="k-lyrics" id="k-lyrics"></div>
+    <canvas id="k-wave" height="64"></canvas>
+  </div>
+
+  <dialog id="modal" aria-labelledby="modal-title">
+    <div class="modal-head"><h3 id="modal-title"></h3><button class="icon-btn" id="modal-close" aria-label="Close">×</button></div>
+    <div class="modal-body" id="modal-body"></div>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <audio id="audio" preload="metadata"></audio>
+</body>
+</html>

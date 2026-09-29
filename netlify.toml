@@ -1,0 +1,34 @@
+# Hookline — AI song studio on top of SunoAPI (https://docs.sunoapi.org)
+# Static site: no build step. Everything the browser needs lives in /public.
+
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# Same-origin proxies so the browser never hits CORS walls.
+# The user's API key travels in the Authorization header and is passed through untouched.
+[[redirects]]
+  from = "/proxy/suno/*"
+  to = "https://api.sunoapi.org/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/proxy/upload/*"
+  to = "https://sunoapiorg.redpandaai.co/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; media-src 'self' https: blob:; connect-src 'self' https://api.sunoapi.org https://sunoapiorg.redpandaai.co https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
