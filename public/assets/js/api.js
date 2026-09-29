@@ -11,7 +11,18 @@ const PROXY = { suno: "/proxy/suno", upload: "/proxy/upload" };
 let proxyWorks = location.protocol.startsWith("http") ? null : false;
 
 let apiKey = "";
-export const setApiKey = (k) => { apiKey = k || ""; };
+export const setApiKey = (k) => { apiKey = normalizeKey(k); };
+
+// Pasted keys often carry junk: surrounding spaces or quotes, invisible zero-width
+// characters, line breaks, or a "Bearer " prefix copied from a code sample.
+export function normalizeKey(k) {
+  return String(k || "")
+    .replace(/[\u200B-\u200D\u2060\uFEFF]/g, "")
+    .trim()
+    .replace(/^["'`]+|["'`]+$/g, "")
+    .replace(/^bearer\s+/i, "")
+    .replace(/\s+/g, "");
+}
 
 export class ApiError extends Error {
   constructor(message, code, data) {
@@ -30,10 +41,11 @@ export function callbackUrl() {
 async function send(base, path, { method, body, form, key }) {
   const headers = { Authorization: `Bearer ${key}` };
   let payload;
-  if (form) payload = form;
-  else if (body !== undefined) {
+  if (form) payload = form; // the browser sets the multipart Content-Type itself
+  else {
+    // SunoAPI's 401 message calls out Content-Type, so send it on every JSON call, GETs included.
     headers["Content-Type"] = "application/json";
-    payload = JSON.stringify(body);
+    if (body !== undefined) payload = JSON.stringify(body);
   }
   const res = await fetch(base + path, { method, headers, body: payload });
   const text = await res.text();
@@ -63,6 +75,19 @@ async function request(service, path, { method = "GET", body, form, key = apiKey
     }
   }
   if (!json) throw new ApiError(`Couldn't reach SunoAPI. ${lastErr?.message || "Check your connection."}`, 0);
+  // If the proxy route is rejected as unauthorized, rule out the proxy dropping the
+  // Authorization header by asking SunoAPI directly once.
+  if (Number(json.code) === 401 && proxyWorks === true && !form) {
+    try {
+      const direct = await send(DIRECT[service], path, { method, body, form, key });
+      if (Number(direct.code) === 200) {
+        proxyWorks = false;
+        json = direct;
+      }
+    } catch {
+      /* direct call blocked (e.g. CORS): keep the proxy's answer */
+    }
+  }
   const code = Number(json.code);
   if (code !== 200) {
     const friendly = ERROR_CODES[code];
@@ -89,6 +114,20 @@ export function clean(obj) {
 
 export const api = {
   credits: (key) => request("suno", "/api/v1/generate/credit", { key }),
+
+  // Validate a pasted key with the free credits call. SunoAPI keys are lowercase hex,
+  // so if a key with capitals is rejected, retry it lowercased before giving up.
+  async verifyKey(raw) {
+    const key = normalizeKey(raw);
+    if (!key) throw new ApiError("Paste your SunoAPI key first.", 401);
+    try {
+      return { key, credits: await api.credits(key) };
+    } catch (e) {
+      const lower = key.toLowerCase();
+      if (e.code !== 401 || lower === key) throw e;
+      return { key: lower, credits: await api.credits(lower), fixedCase: true };
+    }
+  },
 
   // Music creation (all polled through musicInfo)
   generate: (b) => post("/api/v1/generate", clean(b)).then(taskOf),

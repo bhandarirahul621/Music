@@ -66,13 +66,14 @@ $("#gate-reveal").addEventListener("click", (e) => {
 
 $("#gate-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const key = $("#gate-key").value.trim();
+  const raw = $("#gate-key").value;
   const btn = $("#gate-submit");
-  if (!key) return;
+  if (!raw.trim()) return;
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> Checking your key…`;
   try {
-    const credits = await api.credits(key);
+    const { key, credits, fixedCase } = await api.verifyKey(raw);
+    if (fixedCase) toast("Your key worked once lowercased, so we saved it that way.", { timeout: 6000 });
     S.saveKey(key, $("#gate-remember").checked);
     setApiKey(key);
     setCredits(credits);
@@ -81,7 +82,7 @@ $("#gate-form").addEventListener("submit", async (e) => {
     resumeJobs();
     toast(`You're in! ${fmtCredits(credits)} credits ready to spend.`, { type: "ok" });
   } catch (err) {
-    showGate(err.message);
+    showGate(err.code === 401 ? `${err.message}\n\nQuick checks:\n• Copy the key again from sunoapi.org/api-key with its copy button instead of retyping it (keys are case-sensitive).\n• Make sure the key is active. If you're unsure, reset it there and paste the new one.` : err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = "Unlock the studio";
