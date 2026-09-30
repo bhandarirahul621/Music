@@ -1,5 +1,7 @@
 # Hookline: AI song studio
 
+> This repository also contains the **Rogue&Co** clothing storefront in [`rogue-co/`](rogue-co/README.md).
+
 A single-page web app for creating, remixing and polishing AI music with your own
 [SunoAPI](https://docs.sunoapi.org) key. It's plain HTML, CSS and JavaScript with no build step,
 and it's ready to deploy on Netlify.
