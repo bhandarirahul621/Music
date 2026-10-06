@@ -3,37 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Rogue&amp;Co</title>
-  <meta name="description" content="Rogue&amp;Co: heavyweight streetwear made in small runs.">
-  <meta name="theme-color" content="#141414">
+  <title>Rogue&amp;Co Shop</title>
+  <meta name="description" content="Shop Rogue&amp;Co: artist-drawn graphic tees in runs of 300, plus shirts, jeans and European linen.">
+  <meta name="theme-color" content="#0d1222">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="assets/css/styles.css">
   <script src="assets/js/theme-boot.js"></script>
   <script type="module" src="assets/js/app.js"></script>
 </head>
 <body>
   <a class="skip" href="#view">Skip to content</a>
-  <div class="announce">Free shipping over $100 · 30-day returns · Code <strong>ROGUE10</strong> for 10% off your first order</div>
+  <div class="announce">Drop 07 is live · only 300 of each print · Free shipping over $75 · Code <strong>FIRSTSHIP</strong> ships your first order free</div>
 
   <header class="site-header">
     <div class="wrap header-inner">
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
-      <a href="#/" class="logo" aria-label="Rogue and Co, home">ROGUE<span>&amp;</span>CO</a>
+      <a href="#/" class="logo" aria-label="Rogue and Co, home">Rogue<em>&amp;</em>Co</a>
       <nav class="main-nav" id="mainNav" aria-label="Main">
         <a href="#/shop" data-nav="shop">Shop all</a>
-        <a href="#/shop?cat=tees" data-nav="tees">Tees</a>
-        <a href="#/shop?cat=hoodies" data-nav="hoodies">Hoodies</a>
-        <a href="#/shop?cat=outerwear" data-nav="outerwear">Outerwear</a>
-        <a href="#/shop?cat=bottoms" data-nav="bottoms">Bottoms</a>
-        <a href="#/shop?cat=accessories" data-nav="accessories">Accessories</a>
-        <a href="#/about" data-nav="about">About</a>
+        <a href="#/shop?cat=tees" data-nav="tees">Graphic Tees</a>
+        <a href="#/shop?cat=shirts" data-nav="shirts">Shirts</a>
+        <a href="#/shop?cat=jeans" data-nav="jeans">Jeans</a>
+        <a href="#/shop?cat=linen" data-nav="linen">Linen</a>
+        <a href="#/about" data-nav="about">Our Story</a>
       </nav>
       <div class="header-actions">
         <button class="icon-btn" id="searchBtn" aria-label="Search" aria-expanded="false" aria-controls="searchBar">
@@ -55,7 +54,7 @@
     </div>
     <form class="search-bar" id="searchBar" role="search" hidden>
       <div class="wrap">
-        <input type="search" id="searchInput" placeholder="Search tees, hoodies, cargos…" aria-label="Search products" autocomplete="off">
+        <input type="search" id="searchInput" placeholder="Search tees, oxfords, jeans, linen…" aria-label="Search products" autocomplete="off">
       </div>
     </form>
   </header>
@@ -65,25 +64,27 @@
   <footer class="site-footer">
     <div class="wrap footer-grid">
       <div>
-        <a href="#/" class="logo">ROGUE<span>&amp;</span>CO</a>
-        <p class="muted">Heavyweight streetwear, made in small runs. We rarely restock a colorway once it sells out.</p>
+        <a href="#/" class="logo">Rogue<em>&amp;</em>Co</a>
+        <p class="muted">Wear the attitude. Keep the comfort. Artist-drawn tees in runs of 300, plus shirts, jeans and linen built to last.</p>
+        <a class="link sm" href="../">← Back to the Rogue&amp;Co site</a>
       </div>
       <div>
         <h3>Shop</h3>
-        <a href="#/shop?sort=new">New arrivals</a>
-        <a href="#/shop?cat=tees">Tees</a>
-        <a href="#/shop?cat=hoodies">Hoodies</a>
-        <a href="#/shop?cat=outerwear">Outerwear</a>
+        <a href="#/shop?cat=tees">Graphic Tees</a>
+        <a href="#/shop?cat=shirts">Shirts</a>
+        <a href="#/shop?cat=jeans">Jeans</a>
+        <a href="#/shop?cat=linen">Linen</a>
       </div>
       <div>
         <h3>Help</h3>
         <a href="#/orders">Your orders</a>
         <a href="#/wishlist">Wishlist</a>
-        <a href="#/about">About us</a>
+        <a href="../#pricing">Rogue Club</a>
+        <a href="#/about">Our story</a>
       </div>
       <div>
-        <h3>Join the crew</h3>
-        <p class="muted">Get early access to drops. No spam.</p>
+        <h3>Get the next drop first</h3>
+        <p class="muted">New prints and artist stories. Twice a month, no spam.</p>
         <form class="news-form" data-newsletter novalidate>
           <input type="email" name="email" placeholder="you@email.com" aria-label="Email address" required>
           <button class="btn sm" type="submit">Join</button>
@@ -92,7 +93,7 @@
     </div>
     <div class="wrap footer-base">
       <span>© <span id="year"></span> Rogue&amp;Co</span>
-      <span class="muted">Demo storefront. Orders are saved on this device only, and no payment is taken.</span>
+      <span class="muted">Prototype storefront · Brand concept for ISM 6427C · Orders are saved on this device only and no payment is taken.</span>
     </div>
   </footer>
 

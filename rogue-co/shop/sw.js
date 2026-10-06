@@ -1,6 +1,6 @@
 // Offline support: the app shell is cached on install, and pages keep working without a connection.
 // Bump CACHE whenever you deploy changes so returning visitors get the new files.
-const CACHE = "rogueco-v1";
+const CACHE = "rogueco-v2";
 const SHELL = [
   "./",
   "index.html",

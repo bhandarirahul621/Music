@@ -11,15 +11,16 @@ const esc = (v) =>
   String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 const round2 = (n) => Math.round(n * 100) / 100;
+const dollars = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-const FREE_SHIP = 100;
+const FREE_SHIP = 75;
 const SHIPPING = {
   standard: { label: "Standard", eta: "3–5 business days", price: 6, days: 5 },
   express: { label: "Express", eta: "1–2 business days", price: 15, days: 2 },
 };
 const PROMOS = {
-  ROGUE10: { label: "10% off", amount: (sub) => sub * 0.1 },
-  FIRSTDROP: { label: "$15 off orders $75+", amount: (sub) => (sub >= 75 ? 15 : 0) },
+  INSIDER10: { label: "Insider 10% off", amount: (sub) => sub * 0.1 },
+  FIRSTSHIP: { label: "first order shipped free", amount: () => 0, freeShip: true },
 };
 
 const ICON = {
@@ -72,12 +73,12 @@ function newsletterSection() {
     <div class="newsletter">
       <div>
         <p class="eyebrow">Drop alerts</p>
-        <h2>Small runs sell out. Hear about them first.</h2>
-        <p class="muted">Early access to every drop, plus the occasional behind-the-scenes. You can unsubscribe with one click.</p>
+        <h2>Get the next drop first</h2>
+        <p class="muted">New prints, restock alerts and artist stories. Twice a month, no spam.</p>
       </div>
       <form class="news-form lg" data-newsletter novalidate>
         <input type="email" name="email" placeholder="you@email.com" aria-label="Email address" required>
-        <button class="btn" type="submit">Get early access</button>
+        <button class="btn" type="submit">Subscribe</button>
       </form>
     </div>
   </section>`;
@@ -116,14 +117,16 @@ function totals(lines, method = "standard") {
   const discount = promo ? round2(Math.min(promo.amount(subtotal), subtotal)) : 0;
   const after = subtotal - discount;
   const ship = SHIPPING[method] ?? SHIPPING.standard;
-  const shipping = subtotal === 0 ? 0 : method === "standard" && after >= FREE_SHIP ? 0 : ship.price;
-  return { subtotal, discount, code: promo ? code : null, shipping, total: round2(after + shipping), after };
+  const freeStandard = after >= FREE_SHIP || Boolean(promo?.freeShip);
+  const shipping = subtotal === 0 ? 0 : method === "standard" && freeStandard ? 0 : ship.price;
+  return { subtotal, discount, code: promo ? code : null, shipping, total: round2(after + shipping), after, freeStandard };
 }
 
 function summaryRows(t) {
   return `<dl class="sum">
     <div><dt>Subtotal</dt><dd>${money(t.subtotal)}</dd></div>
     ${t.discount ? `<div class="disc"><dt>Discount (${esc(t.code)})</dt><dd>−${money(t.discount)}</dd></div>` : ""}
+    ${!t.discount && t.code ? `<div class="disc"><dt>Code ${esc(t.code)}</dt><dd>Free shipping</dd></div>` : ""}
     <div><dt>Shipping</dt><dd>${t.shipping === 0 ? "Free" : money(t.shipping)}</dd></div>
     <div class="total"><dt>Total</dt><dd>${money(t.total)}</dd></div>
   </dl>`;
@@ -154,61 +157,68 @@ function promoForm() {
 function home(main) {
   const fresh = [...PRODUCTS].sort((a, b) => b.added - a.added).slice(0, 4);
   const best = PRODUCTS.filter((p) => p.badge === "Bestseller").slice(0, 4);
-  const ticker = '<span>ROGUE&amp;CO</span><span aria-hidden="true">✕</span><span>NO MASTERS</span><span aria-hidden="true">✕</span><span>SMALL RUNS</span><span aria-hidden="true">✕</span><span>BUILT TO LAST</span><span aria-hidden="true">✕</span>';
+  const hero = findProduct("night-tide-tee");
+  const ticker = '<span>Drop 07 · Night Tide</span><span aria-hidden="true">✦</span><span>300 pieces per print</span><span aria-hidden="true">✦</span><span>European flax linen</span><span aria-hidden="true">✦</span><span>13.5 oz denim</span><span aria-hidden="true">✦</span><span>Water-based inks</span><span aria-hidden="true">✦</span>';
 
   main.innerHTML = `
   <section class="hero">
     <div class="wrap hero-inner">
       <div class="hero-copy">
-        <p class="eyebrow">FW26 · Drop 01 is live</p>
-        <h1>Made for the ones who don't fit the mold.</h1>
-        <p class="lede">Heavyweight basics and outerwear, cut boxy and built to take a beating. Small runs, and most colorways never come back.</p>
+        <p class="pill">Drop 07 is live · only 300 of each print</p>
+        <h1>Wear the <em>attitude.</em> Keep the comfort.</h1>
+        <p class="lede">Artist-drawn graphic tees on 220 GSM cotton, plus shirts, jeans and European linen cut to fit right and outlast five-wash basics.</p>
         <div class="hero-cta">
-          <a class="btn" href="#/shop?sort=new">Shop the drop</a>
-          <a class="btn ghost" href="#/about">Our story</a>
+          <a class="btn" href="#/product/night-tide-tee">Shop Night Tide</a>
+          <a class="btn ghost" href="${shopHref({ sort: "new" })}">See the whole drop</a>
         </div>
+        <p class="fine-print">Free shipping over ${dollars(FREE_SHIP)} · Free 30-day returns · Size swaps on us</p>
       </div>
-      <div class="hero-art" aria-hidden="true">
-        <a class="hero-tile t1" href="#/product/rogue-standard-hoodie" tabindex="-1">${art("hoodie", "#5e1f24")}</a>
-        <a class="hero-tile t2" href="#/product/outlaw-heavy-tee" tabindex="-1">${art("tee", "#e9e4d8")}</a>
-        <a class="hero-tile t3" href="#/product/backroad-work-jacket" tabindex="-1">${art("jacket", "#a7825a")}</a>
-      </div>
+      <a class="hero-feature" href="#/product/night-tide-tee" aria-label="Night Tide Tee, ${money(hero.price)}">
+        <span class="float f1"><strong>Drop 07 · Night Tide</strong><small>Artist series, print 3 of 5</small></span>
+        ${art(hero.art, hero.colors[0].hex)}
+        <span class="float f2"><strong>220 GSM</strong><small>heavyweight cotton</small></span>
+        <span class="float f3"><strong>${hero.run.left} of ${hero.run.of} left</strong><span class="run"><span style="width:${(hero.run.left / hero.run.of) * 100}%"></span></span></span>
+      </a>
     </div>
   </section>
 
   <div class="marquee" aria-hidden="true"><div class="marquee-track">${ticker.repeat(4)}</div></div>
 
   <section class="wrap section">
-    <div class="section-head"><h2>Shop by category</h2></div>
+    <div class="section-head"><div><p class="eyebrow">Shop by category</p><h2>Four staples, one attitude</h2></div></div>
     <div class="cat-grid">
-      ${CATEGORIES.filter((c) => c.id !== "all").map((c) => `<a class="cat-tile" href="${shopHref({ cat: c.id })}">${art(c.art, c.hex)}<span>${c.label}</span></a>`).join("")}
+      ${CATEGORIES.filter((c) => c.id !== "all").map((c) => {
+        const from = Math.min(...PRODUCTS.filter((p) => p.cat === c.id).map((p) => p.price));
+        return `<a class="cat-tile" href="${shopHref({ cat: c.id })}">${art(c.art, c.hex)}<span>${c.label}<small>From ${dollars(from)} →</small></span></a>`;
+      }).join("")}
     </div>
   </section>
 
   <section class="wrap section">
-    <div class="section-head"><h2>New arrivals</h2><a class="link" href="${shopHref({ sort: "new" })}">View all →</a></div>
+    <div class="section-head"><div><p class="eyebrow">Just dropped</p><h2>New this drop</h2></div><a class="link" href="${shopHref({ sort: "new" })}">View all →</a></div>
     ${grid(fresh)}
   </section>
 
   <section class="wrap section">
     <div class="promo-band">
       <div>
-        <p class="eyebrow">First order?</p>
-        <h2>Take 10% off with code <span class="code">ROGUE10</span></h2>
+        <p class="eyebrow">Rogue Club</p>
+        <h2>First order shipped on us with code <span class="code">FIRSTSHIP</span></h2>
+        <p class="muted">Insiders save 10% on every order with <strong>INSIDER10</strong>.</p>
       </div>
-      <a class="btn light" href="#/shop">Start shopping</a>
+      <a class="btn" href="${shopHref({})}">Start shopping</a>
     </div>
   </section>
 
   <section class="wrap section">
-    <div class="section-head"><h2>Bestsellers</h2><a class="link" href="#/shop">Shop all →</a></div>
+    <div class="section-head"><div><p class="eyebrow">In heavy rotation</p><h2>Bestsellers</h2></div><a class="link" href="#/shop">Shop all →</a></div>
     ${grid(best)}
   </section>
 
   <section class="wrap section perks">
-    <div>${ICON.truck}<h3>Free shipping over $100</h3><p class="muted">Standard shipping is free on orders over $100. Express takes 1–2 days.</p></div>
-    <div>${ICON.return}<h3>30-day returns</h3><p class="muted">Return unworn items with tags within 30 days, no questions asked.</p></div>
-    <div>${ICON.shield}<h3>Built to last</h3><p class="muted">Heavyweight fabrics and triple stitching, made to wear hard for years.</p></div>
+    <div>${ICON.truck}<h3>Free shipping over ${dollars(FREE_SHIP)}</h3><p class="muted">Standard shipping is free over ${dollars(FREE_SHIP)}. Orders ship within 48 hours.</p></div>
+    <div>${ICON.return}<h3>Free 30-day returns and size swaps</h3><p class="muted">Wrong size? Swap it for free. Return anything unworn within 30 days.</p></div>
+    <div>${ICON.shield}<h3>Fabric first, fit second, trend last</h3><p class="muted">220 GSM cotton, 13.5 oz denim and European flax, built for 100+ washes.</p></div>
   </section>
 
   ${newsletterSection()}`;
@@ -285,6 +295,7 @@ function product(main, params, [id]) {
         ${badgeHtml(p)}
         <h1>${esc(p.name)}</h1>
         <div class="price lg">${priceHtml(p)}</div>
+        ${p.run ? `<div class="run-meter"><span><strong>${p.run.left} of ${p.run.of}</strong> left in this run</span><span class="run"><span style="width:${(p.run.left / p.run.of) * 100}%"></span></span></div>` : ""}
         <p class="lede">${esc(p.blurb)}</p>
 
         <div class="opt">
@@ -314,11 +325,11 @@ function product(main, params, [id]) {
           <button type="button" class="btn grow" id="addBtn">Add to cart · ${money(p.price)}</button>
           <button type="button" class="icon-btn wish-lg ${store.isWished(p.id) ? "on" : ""}" data-wish="${p.id}" aria-pressed="${store.isWished(p.id)}" aria-label="Save to wishlist">${ICON.heart}</button>
         </div>
-        <p class="ship-note">${ICON.truck} ${p.price >= FREE_SHIP ? "Ships free" : `Free shipping on orders over ${money(FREE_SHIP)}`} · Returns within 30 days</p>
+        <p class="ship-note">${ICON.truck} ${p.price >= FREE_SHIP ? "Ships free" : `Free shipping on orders over ${dollars(FREE_SHIP)}`} · Returns within 30 days</p>
 
         <details open><summary>Details</summary><ul>${p.details.map((d) => `<li>${esc(d)}</li>`).join("")}</ul></details>
         <details><summary>Size &amp; fit</summary><p>${esc(p.fit)}</p></details>
-        <details><summary>Shipping &amp; returns</summary><p>Standard shipping takes 3–5 business days and is free on orders over ${money(FREE_SHIP)}. Express takes 1–2 business days for ${money(SHIPPING.express.price)}. You can return unworn items with tags within 30 days.</p></details>
+        <details><summary>Shipping &amp; returns</summary><p>Standard shipping takes 3–5 business days and is free on orders over ${dollars(FREE_SHIP)}. Express takes 1–2 business days for ${money(SHIPPING.express.price)}. You can return unworn items with tags within 30 days.</p></details>
       </div>
     </div>
   </section>
@@ -447,7 +458,7 @@ function checkout(main) {
     $("#coPromo").innerHTML = promoForm();
     $$("[data-rate]", form).forEach((el) => {
       const k = el.dataset.rate;
-      const free = k === "standard" && t.after >= FREE_SHIP;
+      const free = k === "standard" && t.freeStandard;
       el.textContent = free ? "Free" : money(SHIPPING[k].price);
     });
     $("#placeBtn").textContent = `Place order · ${money(t.total)}`;
@@ -534,15 +545,16 @@ function orders(main) {
 function about(main) {
   main.innerHTML = `<section class="about-hero">
     <div class="wrap narrow">
-      <p class="eyebrow">About Rogue&amp;Co</p>
-      <h1>Clothes for people who'd rather not blend in.</h1>
-      <p class="lede">Rogue&amp;Co started with one heavyweight tee and a refusal to make anything flimsy. We still work the same way: small runs, fabrics that last, and cuts that feel like yours.</p>
+      <p class="eyebrow">Our approach</p>
+      <h1>Clothing made like your favorite tee, the one you never throw out.</h1>
+      <p class="lede">Everyone owns one: the shirt that got better with every wash, fit like it was measured on you, and still gets compliments. Rogue&amp;Co exists to make every piece that shirt.</p>
+      <p class="about-back"><a class="link" href="../">Read the full Rogue&amp;Co story →</a></p>
     </div>
   </section>
   <section class="wrap section values">
-    <div><span class="num">01</span><h3>Small runs</h3><p class="muted">We make limited quantities of each colorway, so there's less waste and you won't see your fit on everyone.</p></div>
-    <div><span class="num">02</span><h3>Heavyweight everything</h3><p class="muted">Our tees start at 240gsm and our fleece at 400gsm, so they hold their shape wash after wash.</p></div>
-    <div><span class="num">03</span><h3>Honest pricing</h3><p class="muted">No fake markdowns. When something is on sale, it's because a season is ending.</p></div>
+    <div><span class="num">300</span><h3>Pieces per print</h3><p class="muted">Every graphic comes from an independent illustrator, printed in a numbered run of 300 and then retired for good. Artists earn a royalty on every shirt.</p></div>
+    <div><span class="num">220</span><h3>GSM cotton, water-based inks</h3><p class="muted">Heavyweight combed cotton with inks that soften instead of cracking, built and tested for 100 washes.</p></div>
+    <div><span class="num">6</span><h3>Body-measured sizes</h3><p class="muted">Graded on real measurements from XS to XXL, so fit stops being a guess and returns stop being routine.</p></div>
   </section>
   ${newsletterSection()}`;
 }
@@ -572,8 +584,8 @@ function renderCart() {
   }
 
   const t = totals(lines);
-  const left = FREE_SHIP - t.after;
-  const pct = Math.min(100, (t.after / FREE_SHIP) * 100);
+  const left = t.freeStandard ? 0 : FREE_SHIP - t.after;
+  const pct = t.freeStandard ? 100 : Math.min(100, (t.after / FREE_SHIP) * 100);
 
   $("#cartBody").innerHTML = `
     <div class="ship-progress">
@@ -658,17 +670,17 @@ function toast(html, kind = "ok") {
   }, 2800);
 }
 
-const THEMES = ["system", "light", "dark"];
+const THEMES = ["dark", "light"];
 function getTheme() {
   try {
-    return localStorage.getItem("rc.theme") || "system";
+    return localStorage.getItem("rc.theme") === "light" ? "light" : "dark";
   } catch {
-    return "system";
+    return "dark";
   }
 }
 function applyTheme(t) {
-  if (t === "system") document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme", t);
+  if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+  else document.documentElement.removeAttribute("data-theme");
   try {
     localStorage.setItem("rc.theme", t);
   } catch {
